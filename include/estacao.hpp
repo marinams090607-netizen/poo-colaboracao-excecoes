@@ -87,12 +87,16 @@ struct ResultadoLeitura {
     const char* motivo;
 };
 
-inline ResultadoLeitura executarCiclo(const IFonteLeitura& fonte, bool disponivel,
-                                     bool calibrada, int& abertas) {
+inline ResultadoLeitura executarCiclo(const IFonteLeitura& fonte,
+                                      bool disponivel,
+                                      bool calibrada,
+                                      int& abertas) {
     try {
         return {true, lerServico(fonte, disponivel, calibrada, abertas), ""};
-    // EXTENSAO: capture FalhaCalibracao antes de FalhaLeitura e devolva
-    // {false, 0, "calibracao"}. A classe-base ja captura a indisponibilidade.
+
+    } catch (const FalhaCalibracao&) {
+        return {false, 0, "calibracao"};
+
     } catch (const FalhaLeitura&) {
         return {false, 0, "indisponivel"};
     }

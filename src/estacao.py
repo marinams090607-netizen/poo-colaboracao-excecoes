@@ -91,5 +91,8 @@ def executar_ciclo(fonte, disponivel, calibrada, sessao):
     try:
         return True, ler_servico(fonte, disponivel, calibrada, sessao), ""
 
+    except FalhaCalibracao:
+        return False, 0, "calibracao"
+
     except FalhaLeitura:
         return False, 0, "indisponivel"
