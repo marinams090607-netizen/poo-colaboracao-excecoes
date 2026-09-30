@@ -61,11 +61,18 @@ public:
 };
 
 inline double adquirir(const IFonteLeitura& fonte, bool disponivel,
-                      bool calibrada, int& abertas) {
+                       bool calibrada, int& abertas) {
+
     Sessao sessao{abertas};
-    if (!disponivel) throw FalhaLeitura("fonte indisponivel");
-    // ETAPA GUIADA: se disponivel, mas sem calibracao, lance FalhaCalibracao.
-    (void)calibrada;
+
+    if (!disponivel) {
+        throw FalhaLeitura("fonte indisponivel");
+    }
+
+    if (!calibrada) {
+        throw FalhaCalibracao("falha de calibracao");
+    }
+
     return fonte.valor();
 }
 
@@ -80,12 +87,16 @@ struct ResultadoLeitura {
     const char* motivo;
 };
 
-inline ResultadoLeitura executarCiclo(const IFonteLeitura& fonte, bool disponivel,
-                                     bool calibrada, int& abertas) {
+inline ResultadoLeitura executarCiclo(const IFonteLeitura& fonte,
+                                      bool disponivel,
+                                      bool calibrada,
+                                      int& abertas) {
     try {
         return {true, lerServico(fonte, disponivel, calibrada, abertas), ""};
-    // EXTENSAO: capture FalhaCalibracao antes de FalhaLeitura e devolva
-    // {false, 0, "calibracao"}. A classe-base ja captura a indisponibilidade.
+
+    } catch (const FalhaCalibracao&) {
+        return {false, 0, "calibracao"};
+
     } catch (const FalhaLeitura&) {
         return {false, 0, "indisponivel"};
     }
